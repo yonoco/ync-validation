@@ -1,1 +1,1 @@
-handcrafted validation library for both client and serverside
+handcrafted js framework for client-side and server-side validation
