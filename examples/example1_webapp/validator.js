@@ -32,10 +32,24 @@ module.exports = function(obj, callback) {
 		new FailedResult('password', 'ERROR', 'length')
 	);
 
+	var emailReservedValidator = new Validator(
+		function validate(obj, callback) {
+			setTimeout(
+				function() {
+					callback(
+						false
+					)
+				},
+				2000);
+		},
+		new FailedResult('password', 'ERROR', 'reserved')
+	);
+
 	validate(
 		obj, [
 			emailRequiredValidator,
 			emailFormatValidator,
+			emailReservedValidator,
 			passwordRequiredValidator,
 			passwordLengthValidator
 		],
