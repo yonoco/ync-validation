@@ -18,11 +18,28 @@ module.exports = function(obj, callback) {
 
 	var passwordRequiredValidator = new RequiredValidator('password');
 
-	var emailFormatValidator = new Validator(function validate(obj) {
-		var field = obj.email;
-		return !field || (field.indexOf('@') >= 0 && field.indexOf('.') >= 0 && field.lastIndexOf('@') < field.lastIndexOf('.'));
-	}, new FailedResult('email', 'ERROR', 'email'));
+	var emailFormatValidator = new Validator(
+		function validate(obj) {
+			var field = obj.email;
+			return !field || (field.indexOf('@') >= 0 && field.indexOf('.') >= 0 && field.lastIndexOf('@') < field.lastIndexOf('.'));
+		},
+		new FailedResult('email', 'ERROR', 'format'));
 
-	validate(obj, [emailRequiredValidator, emailFormatValidator, passwordRequiredValidator], callback);
+	var passwordLengthValidator = new Validator(
+		function validate(obj) {
+			return !obj.password || obj.password.length >= 6;
+		},
+		new FailedResult('password', 'ERROR', 'length')
+	);
+
+	validate(
+		obj, [
+			emailRequiredValidator,
+			emailFormatValidator,
+			passwordRequiredValidator,
+			passwordLengthValidator
+		],
+		callback
+	);
 
 }
