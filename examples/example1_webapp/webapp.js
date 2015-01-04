@@ -10,6 +10,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.locals._ = _;
+app.locals.pretty = true;
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -24,10 +25,7 @@ app.post('/signup', function(request, response) {
     console.log(JSON.stringify(request.body, null, 2));
 
     validate(request.body, function(error, result) {
-        console.log("EMAIL FIELDS");
-        console.log(_.find(result.validationResults, {
-            field: 'email'
-        }));
+        if (error) throw error;
         response.render('index', {
             result: result
         });

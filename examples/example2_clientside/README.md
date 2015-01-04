@@ -1,0 +1,1 @@
+index.html must be opened on a webserver which is started in the root folder

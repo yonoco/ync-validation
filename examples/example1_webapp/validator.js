@@ -2,17 +2,9 @@ var validation = require('../../lib/validation');
 var validate = validation.validate;
 var Validator = validation.Validator;
 var FailedResult = validation.FailedResult;
+var RequiredValidator = validation.RequiredValidator;
 
 module.exports = function(obj, callback) {
-
-	function RequiredValidator(field) {
-		var validateFn = function validate(obj) {
-			return !!obj[field];
-		};
-		Validator.call(this, validateFn, new FailedResult(field, 'ERROR', 'required'));
-	}
-
-	RequiredValidator.prototype = new Validator();
 
 	var emailRequiredValidator = new RequiredValidator('email');
 
