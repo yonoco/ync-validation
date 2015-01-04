@@ -42,7 +42,7 @@ module.exports = function(obj, callback) {
 				},
 				2000);
 		},
-		new FailedResult('password', 'ERROR', 'reserved')
+		new FailedResult('email', 'ERROR', 'reserved')
 	);
 
 	validate(

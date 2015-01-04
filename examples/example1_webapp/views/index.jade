@@ -22,8 +22,25 @@ html(lang='en')
             $(document).ready(function() {
                 Ladda.bind( '.ladda-button', { timeout: 2000 } );
             });
-            
 
+        style.
+            .form-alert {
+                margin-bottom: 0px;
+                padding-top:5px;
+                padding-bottom:5px;
+            }
+        
+
+    mixin error(msg)
+        div(class="alert alert-danger form-alert",role="alert")
+            span(class="glyphicon glyphicon-exclamation-sign", aria-hidden="true")
+            span(class="sr-only") Error:
+            =msg
+
+    mixin err(field, type, msg)
+        - if(result && !!_.find(result.validationResults, {field: field, type:type})) {
+            +error(msg)
+        - }
         
     body
         .container
@@ -31,11 +48,19 @@ html(lang='en')
                 div(class='col-md-offset-3 col-md-6')
                     form.form-signin(method="post", action="/signup")
                         h2.form-signin-heading Signup
+                        +err('email', 'required', 'Email is required')
+                        +err('email', 'format', 'Email has wrong format')
+                        +err('email', 'reserved', 'Email already reserved')
                         input.form-control(type="text", name="email", placeholder="email",autofocus)
+
+                        +err('password', 'required', 'Password is required')
+                        +err('password', 'length', 'Password must contain more than 6 characters')
                         input.form-control(type="password", name="password", placeholder="password")
                         button(class="btn btn-primary ladda-button", data-style="expand-right") 
                             span.ladda-label Submit
-                div(class='col-md-offset2 col-md-8')
-                    |The result object:
-                div(class='col-md-offset2 col-md-8')
-                    =result
+            .row
+                div(class='col-md-offset3 col-md-6')
+                    span The result object:
+            .row
+                div(class='col-md-offset3 col-md-6')
+                    span=JSON.stringify(result, null, 2)
