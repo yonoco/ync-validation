@@ -42,7 +42,8 @@ module.exports = function(obj, callback) {
 				},
 				2000);
 		},
-		new FailedResult('email', 'ERROR', 'reserved')
+		new FailedResult('email', 'ERROR', 'reserved'),
+		2 // it gets level 2, it means it will be validated only if everything else is fine
 	);
 
 	validate(
