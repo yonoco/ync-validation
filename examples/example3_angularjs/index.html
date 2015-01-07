@@ -20,15 +20,15 @@
 
 
   </head>
-  <body ng-app="yncApp" ng-controller="Controller"> 
+  <body ng-app="yncApp" ng-controller="Controller as ctrl"> 
     <div class="container">
       <div class="row">
         <div class="col-md-offset-3 col-md-6">
           <form class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
-            <input type="text" name="email" placeholder="email" autofocus class="form-control" ng-enter="show()">
-            <input type="password" name="password" placeholder="password" class="form-control" >
-            <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" ng-click="show()">
+            <input type="text" name="email" placeholder="email" autofocus class="form-control" ng-enter="ctrl.validate()">
+            <input type="password" name="password" placeholder="password" class="form-control" ng-enter="ctrl.validate()">
+            <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" ng-click="ctrl.validate()">
               <span class="ladda-label">Submit</span>
             </button>
           </form>
@@ -68,11 +68,20 @@
                 });
             };
           })
-          .controller('Controller', function($scope) {
+          .controller('Controller', function($scope, validationService) {
             alert('ctrl load');
-            $scope.show = function() {
-                console.log('asdas');
+            this.validate = function() {
+                validationService.validate();
             };
+          })
+          .factory('validationService', function(){
+
+              return {
+                validate: function() {
+                  alert('validateSrevice.validate');
+                }
+              };
+
           });
     })(); 
   </script>
