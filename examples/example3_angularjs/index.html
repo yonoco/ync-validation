@@ -20,15 +20,15 @@
 
 
   </head>
-  <body>
+  <body ng-app="yncApp" ng-controller="Controller"> 
     <div class="container">
       <div class="row">
         <div class="col-md-offset-3 col-md-6">
           <form class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
-            <input type="text" name="email" placeholder="email" autofocus class="form-control">
-            <input type="password" name="password" placeholder="password" class="form-control">
-            <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" onclick="validate()">
+            <input type="text" name="email" placeholder="email" autofocus class="form-control" ng-enter="show()">
+            <input type="password" name="password" placeholder="password" class="form-control" >
+            <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" ng-click="show()">
               <span class="ladda-label">Submit</span>
             </button>
           </form>
@@ -47,8 +47,33 @@
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script src="//msurguy.github.io/ladda-bootstrap/dist/spin.min.js"></script>
   <script src="//msurguy.github.io/ladda-bootstrap/dist/ladda.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+
   <script src="../../lib/validation.js"></script>
   <script>
-  <!-- TODO ANGULAR CODE COMES HERE --> 
+    (function() {
+        'use strict';
+
+        angular.module('yncApp', [])
+          .directive('ngEnter', function () {
+            return function (scope, element, attrs) {
+                element.bind('keydown keypress', function (event) {
+                    if(event.which === 13) {
+                        scope.$apply(function (){
+                            scope.$eval(attrs.ngEnter);
+                        });
+
+                        event.preventDefault();
+                    }
+                });
+            };
+          })
+          .controller('Controller', function($scope) {
+            alert('ctrl load');
+            $scope.show = function() {
+                console.log('asdas');
+            };
+          });
+    })(); 
   </script>
 </html>
