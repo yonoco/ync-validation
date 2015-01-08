@@ -24,21 +24,21 @@
     <div class="container">
       <div class="row">
         <div class="col-md-offset-3 col-md-6">
-          <form class="form-signin" id="form-signin">
+          <div ng-form="signin_form" novalidate class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
-            <input type="text" name="email" placeholder="email" autofocus class="form-control" ng-enter="ctrl.validate()">
-            <input type="password" name="password" placeholder="password" class="form-control" ng-enter="ctrl.validate()">
+            <input type="text" name="email" ng-model="ctrl.email" placeholder="email" autofocus class="form-control" ng-enter="ctrl.validate()">
+            <input type="password" name="password" ng-model="ctrl.password" placeholder="password" class="form-control" ng-enter="ctrl.validate()">
             <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" ng-click="ctrl.validate()">
               <span class="ladda-label">Submit</span>
             </button>
-          </form>
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="col-md-offset3 col-md-6"><span>The result object:</span></div>
       </div>
       <div class="row">
-        <div class="col-md-offset3 col-md-6"><span id="validationResult"></span></div>
+        <div class="col-md-offset3 col-md-6"><span id="validationResult">{{ctrl.validationResult}}</span></div>
       </div>
     </div>
   </body>
@@ -70,17 +70,69 @@
           })
           .controller('Controller', function($scope, validationService) {
             alert('ctrl load');
+            var ctrl = this;
             this.validate = function() {
-                validationService.validate();
+                validationService.validate(
+                  {
+                    email: ctrl.email, 
+                    password: ctrl.password
+                  }, 
+                  function(err,res){
+                    if(err) return alert(err);
+                    ctrl.validationResult = res;
+                  });
             };
           })
           .factory('validationService', function(){
 
-              return {
-                validate: function() {
-                  alert('validateSrevice.validate');
-                }
-              };
+            var emailRequiredValidator = new ync.RequiredValidator('email');
+
+            var passwordRequiredValidator = new ync.RequiredValidator('password');
+
+            var emailFormatValidator = new ync.Validator(
+              function validate(obj) {
+                var field = obj.email;
+                return !field || (field.indexOf('@') >= 0 && field.indexOf('.') >= 0 && field.lastIndexOf('@') < field.lastIndexOf('.'));
+              },
+              new ync.FailedResult('email', 'ERROR', 'format'));
+
+            var passwordLengthValidator = new ync.Validator(
+              function validate(obj) {
+                return !obj.password || obj.password.length >= 6;
+              },
+              new ync.FailedResult('password', 'ERROR', 'length')
+            );
+
+            var emailReservedValidator = new ync.Validator(
+              function validate(obj, callback) {
+                setTimeout(
+                  function() {
+                    callback(
+                      false
+                    )
+                  },
+                  2000
+                );
+              },
+              new ync.FailedResult('email', 'ERROR', 'reserved'),
+              2
+            );
+
+            return {
+              validate: function(obj, callback) {
+                ync.validate(
+                  obj, 
+                  [
+                    emailRequiredValidator,
+                    emailFormatValidator,
+                    emailReservedValidator,
+                    passwordRequiredValidator,
+                    passwordLengthValidator
+                  ], 
+                  callback
+                );
+              }
+            };
 
           });
     })(); 
