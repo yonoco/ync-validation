@@ -26,17 +26,9 @@
         <div class="col-md-offset-3 col-md-6">
           <form class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
-            <div style="display:none" id="email-error-block" role="alert" class="alert alert-danger form-alert">
-              <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
-              <span class="sr-only">Error:</span>
-              <span id="email-error-msg">Email has wrong format</span>
-            </div>
+            <div id="email-error-container"></div>
             <input type="text" name="email" placeholder="email" autofocus class="form-control">
-            <div style="display:none" id="password-error-block" role="alert" class="alert alert-danger form-alert">
-              <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
-              <span class="sr-only">Error:</span>
-              <span id="password-error-msg">Email has wrong format</span>
-            </div>
+            <div id="password-error-container"></div>
             <input type="password" name="password" placeholder="password" class="form-control">
             <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" onclick="validate()">
               <span class="ladda-label">Submit</span>
@@ -57,7 +49,17 @@
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script src="//msurguy.github.io/ladda-bootstrap/dist/spin.min.js"></script>
   <script src="//msurguy.github.io/ladda-bootstrap/dist/ladda.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
   <script src="../../lib/validation.js"></script>
+
+  <script id="error-template" type="text/x-handlebars-template">
+    <div role="alert" class="alert alert-danger form-alert">
+      <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
+      <span class="sr-only">Error:</span>
+      <span>{{errormsg}}</span>
+    </div>
+  </script>
+
   <script>
 
     var emailRequiredValidator,
@@ -65,16 +67,46 @@
       emailReservedValidator,
       passwordRequiredValidator,
       passwordLengthValidator,
-      laddaButton;
+      laddaButton,
+      errorTmpl;
 
 
 
     $(document).ready(function() {
 
+        initTemplate();
+
         laddaButton = Ladda.create( document.querySelector( '.ladda-button' ) );
 
         initValidators();
+
+
     });
+
+    function initTemplate() {
+
+      var errorTmplSource = document.getElementById('error-template').innerHTML;
+      errorTmpl = Handlebars.compile(errorTmplSource);
+
+    }
+
+    function addErrorMsg(id, msg){
+
+        var errorTmplSource = document.getElementById('error-template').innerHTML;
+        errorTmpl = Handlebars.compile(errorTmplSource);
+        var container = document.createElement('div');
+        container.innerHTML =  errorTmpl({errormsg: msg});
+        document.getElementById(id).appendChild(container);
+    }
+
+    function clearErrorMsg(id) {
+
+      var errContainer = document.getElementById(id);
+      while (errContainer.firstChild) {
+        errContainer.removeChild(errContainer.firstChild);
+      } 
+
+    }
 
     
 
@@ -123,6 +155,9 @@
 
       laddaButton.start();
 
+      clearErrorMsg('email-error-container');
+      clearErrorMsg('password-error-container');
+
       var obj = {
         email: email,
         password: password
@@ -142,36 +177,47 @@
           }
           laddaButton.stop();
           document.getElementById('validationResult').innerHTML = JSON.stringify(res,null,2);
-          showEmailError();
-          showPasswordError();
+
+          processAndShowErrors(res);
         }
       );
       
 
     }
 
-    function hideEmailError() {
-      hide('email-error-block');
-    }
+    function processAndShowErrors(res) {
+      if(!res && !res.validationResults) return;
 
-    function showEmailError() {
-      show('email-error-block');
-    }
+      var valResult;
+      var emailMsg = '';
+      var passwordMsg = '';
 
-    function hidePasswordError() {
-      hide('password-error-block')
-    }
+      var messages = {
+        email: {
+          required: 'Email is required',
+          format: 'Email has wrong format',
+          reserved: 'Email already reserved'  
+        },
+        password: {
+          required: 'Password is required',
+          length: 'Password must contain more than 6 characters'
+        }
+      };
 
-    function showPasswordError() {
-      show('password-error-block');
-    }
+      var messagesClass = {
+        email: 'email-error-container',
+        password: 'password-error-container'
+      };
 
-    function hide(id) {
-      document.getElementById(id).style.display = 'none';        
-    }
+      for(var i=0; i<res.validationResults.length; i++) {
 
-    function show(id) {
-      document.getElementById(id).style.display = 'block';        
+        valResult = res.validationResults[i];
+        console.log(valResult);
+        addErrorMsg(
+          messagesClass[valResult.field], 
+          messages[valResult.field][valResult.type]
+        );
+      }
     }
 
   </script>
