@@ -26,7 +26,17 @@
         <div class="col-md-offset-3 col-md-6">
           <form class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
+            <div style="display:none" id="email-error-block" role="alert" class="alert alert-danger form-alert">
+              <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="sr-only">Error:</span>
+              <span id="email-error-msg">Email has wrong format</span>
+            </div>
             <input type="text" name="email" placeholder="email" autofocus class="form-control">
+            <div style="display:none" id="password-error-block" role="alert" class="alert alert-danger form-alert">
+              <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="sr-only">Error:</span>
+              <span id="password-error-msg">Email has wrong format</span>
+            </div>
             <input type="password" name="password" placeholder="password" class="form-control">
             <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" onclick="validate()">
               <span class="ladda-label">Submit</span>
@@ -50,18 +60,23 @@
   <script src="../../lib/validation.js"></script>
   <script>
 
-  var emailRequiredValidator,
+    var emailRequiredValidator,
       emailFormatValidator,
       emailReservedValidator,
       passwordRequiredValidator,
       passwordLengthValidator,
       laddaButton;
 
+
+
     $(document).ready(function() {
+
         laddaButton = Ladda.create( document.querySelector( '.ladda-button' ) );
 
         initValidators();
     });
+
+    
 
     function initValidators() {
 
@@ -127,10 +142,36 @@
           }
           laddaButton.stop();
           document.getElementById('validationResult').innerHTML = JSON.stringify(res,null,2);
+          showEmailError();
+          showPasswordError();
         }
       );
       
 
+    }
+
+    function hideEmailError() {
+      hide('email-error-block');
+    }
+
+    function showEmailError() {
+      show('email-error-block');
+    }
+
+    function hidePasswordError() {
+      hide('password-error-block')
+    }
+
+    function showPasswordError() {
+      show('password-error-block');
+    }
+
+    function hide(id) {
+      document.getElementById(id).style.display = 'none';        
+    }
+
+    function show(id) {
+      document.getElementById(id).style.display = 'block';        
     }
 
   </script>
