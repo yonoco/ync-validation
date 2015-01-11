@@ -90,7 +90,7 @@
               }
             };
           })
-          .controller('Controller', function($scope, validationService) {
+          .controller('Controller', function($scope, $timeout, validationService) {
             var ctrl = this;
 
             var messages = {
@@ -104,6 +104,9 @@
                 length: 'Password must contain more than 6 characters'
               }
             };
+
+            var laddaButton = Ladda.create( document.querySelector( '.ladda-button' ) );
+
 
             this.validationErrors = [];
 
@@ -121,17 +124,23 @@
             }
 
             this.validate = function() {
+                laddaButton.start();
                 validationService.validate(
                   {
                     email: ctrl.email, 
                     password: ctrl.password
                   }, 
                   function(err,res){
+                    laddaButton.stop();
                     if(err) return alert(err);
-                    ctrl.validationResult = res;
-                    ctrl.validationErrors = resolveMessages(res);
+                    // usual timeout hack to update ui after async
+                    $timeout(function(){
+                      ctrl.validationResult = res;
+                      ctrl.validationErrors = resolveMessages(res);
+                    });
                   });
             };
+
           })
           .factory('validationService', function(){
 
