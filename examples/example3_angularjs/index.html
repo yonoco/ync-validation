@@ -27,8 +27,9 @@
         <div class="col-md-offset-3 col-md-6">
           <div ng-form="signin_form" novalidate class="form-signin" id="form-signin">
             <h2 class="form-signin-heading">Signup</h2>
-            <div ng-include src="'error-template'"></div>
+            <div ync-error field="email" errors="ctrl.validationErrors"></div>
             <input type="text" name="email" ng-model="ctrl.email" placeholder="email" autofocus class="form-control" ng-enter="ctrl.validate()">
+            <div ync-error field="password" errors="ctrl.validationErrors"></div>
             <input type="password" name="password" ng-model="ctrl.password" placeholder="password" class="form-control" ng-enter="ctrl.validate()">
             <button data-style="expand-right" class="btn btn-primary ladda-button" type="button" ng-click="ctrl.validate()">
               <span class="ladda-label">Submit</span>
@@ -53,11 +54,11 @@
 
   <script src="../../lib/validation.js"></script>
 
-  <script id="error-template" type="text/ng-template">
-      <div role="alert" class="alert alert-danger form-alert">
+  <script id="ync-error-template" type="text/ng-template">
+      <div role="alert" class="alert alert-danger form-alert" ng-repeat="error in errors | filter:{field:field}">
         <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
         <span class="sr-only">Error:</span>
-        <span>Message</span>
+        <span>{{error.msg}}</span>
       </div>
     </script>
 
@@ -80,8 +81,24 @@
                 });
             };
           })
+          .directive('yncError', function(){
+            return {
+              templateUrl: 'ync-error-template',
+              scope: {
+                errors: '=',
+                field: '@'
+              }
+            };
+          })
           .controller('Controller', function($scope, validationService) {
             var ctrl = this;
+
+            this.validationErrors = [
+              {field: 'email', msg: 'emailmsg'},
+              {field: 'password', msg: 'passwordmsg'},
+              {field: 'email', msg: 'emailmsg2'}
+            ];
+
             this.validate = function() {
                 validationService.validate(
                   {
